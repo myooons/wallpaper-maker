@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 달력 월페이퍼 메이커</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Monthly Wallpaper</h1>
+        
+        <div class="input-group">
+            <label>배경 이미지 선택 (미선택 시 랜덤 색상)</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <div class="input-group">
+            <label>해상도 설정 (기본: 현재 기기)</label>
+            <div class="res-inputs">
+                <input type="number" id="widthInput" placeholder="가로">
+                <input type="number" id="heightInput" placeholder="세로">
+            </div>
+        </div>
+
+        <button id="generateBtn">월페이퍼 생성하기</button>
+        
+        <hr>
+        
+        <div id="resultArea" style="display:none;">
+            <canvas id="wallpaperCanvas"></canvas>
+            <br>
+            <a id="downloadBtn" class="btn-download">이미지 저장하기</a>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
