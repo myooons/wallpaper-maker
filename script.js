@@ -64,21 +64,63 @@ function drawRandomSolid(w, h) {
     ctx.fillRect(0, 0, w, h);
 }
 
-// 달력 그리기 (단순화된 버전)
 function drawCalendar(w, h) {
     const now = new Date();
     const year = now.getFullYear();
-    const month = now.getMonth();
+    const month = now.getMonth(); // 0부터 시작 (4월은 3)
     
-    // 가독성을 위한 텍스트 색상 판단 (샘플링)
-    const pixel = ctx.getImageData(w/2, h/2, 1, 1).data;
+    // 1. 가독성을 위한 색상 결정 (배경 밝기 기준)
+    const pixel = ctx.getImageData(w / 2, h * 0.8, 1, 1).data;
     const brightness = (pixel[0] * 299 + pixel[1] * 587 + pixel[2] * 114) / 1000;
-    ctx.fillStyle = brightness > 125 ? 'black' : 'white';
+    const mainColor = brightness > 125 ? '#333333' : '#FFFFFF';
+    const pointColor = '#FF3B30'; // 일요일/공휴일용 빨간색
     
     ctx.textAlign = 'center';
-    ctx.font = `bold ${w * 0.05}px Arial`;
-    ctx.fillText(`${year}.${month + 1}`, w / 2, h * 0.2);
+    ctx.textBaseline = 'middle';
+
+    // 2. 상단 제목 (예: April 2026)
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"];
+    ctx.font = `bold ${w * 0.07}px sans-serif`;
+    ctx.fillStyle = mainColor;
+    ctx.fillText(`${monthNames[month]}`, w * 0.35, h * 0.65);
+    ctx.fillText(`${year}`, w * 0.65, h * 0.65);
+
+    // 3. 요일 헤더 (Sun ~ Sat)
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const colWidth = w * 0.12; // 열 간격
+    const startX = w / 2 - (colWidth * 3); // 시작 X 좌표 (중앙 정렬)
+    const startY = h * 0.72; // 요일 시작 Y 좌표
     
-    // 날짜 로직 (생략: 여기에 반복문을 돌려 날짜를 그리게 됩니다)
-    // 공휴일 API 연결 시 일요일과 함께 빨간색 조건 추가
+    ctx.font = `bold ${w * 0.035}px sans-serif`;
+    daysOfWeek.forEach((day, i) => {
+        ctx.fillStyle = (i === 0) ? pointColor : mainColor; // 일요일은 빨간색
+        ctx.fillText(day, startX + (i * colWidth), startY);
+    });
+
+    // 4. 날짜 그리드 그리기
+    const firstDay = new Date(year, month, 1).getDay(); // 1일의 요일 (0:일 ~ 6:토)
+    const lastDate = new Date(year, month + 1, 0).getDate(); // 이번 달 마지막 날짜
+    const rowHeight = h * 0.05; // 행 간격
+    
+    ctx.font = `${w * 0.035}px sans-serif`;
+    
+    let curDay = 1;
+    for (let row = 0; row < 6; row++) { // 최대 6행
+        for (let col = 0; col < 7; col++) {
+            // 첫 줄 시작 요일 체크 및 마지막 날짜 체크
+            if ((row === 0 && col < firstDay) || curDay > lastDate) continue;
+
+            const x = startX + (col * colWidth);
+            const y = startY + rowHeight + (row * rowHeight);
+            
+            // 색상 지정 (일요일은 빨간색)
+            ctx.fillStyle = (col === 0) ? pointColor : mainColor;
+            
+            // 공휴일 로직 추가 시 여기에 조건문 삽입 (예: if(holidayList.includes(curDay)) ...)
+            
+            ctx.fillText(curDay.toString(), x, y);
+            curDay++;
+        }
+    }
 }
